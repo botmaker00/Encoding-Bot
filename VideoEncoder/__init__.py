@@ -37,7 +37,7 @@ SUDO_USERS = getenv("SUDO_USERS")                 # Space separated IDs
 EVERYONE_CHATS = getenv("EVERYONE_CHATS")         # Chats where everyone can use bot
 
 # Log Channel (Optional, can be user/channel/group ID)
-LOG_CHANNEL = getenv("LOG_CHANNEL", "").strip()
+log = getenv("LOG_CHANNEL", "").strip()
 
 # Progress Format
 PROGRESS = """
