@@ -1,4 +1,14 @@
 import urllib.parse
+import re
+import sys
+
+# Patch re.sre_parse which was moved to re._parser in Python 3.11+
+try:
+    from re import sre_parse
+except ImportError:
+    import re._parser
+    re.sre_parse = re._parser
+    sys.modules['re.sre_parse'] = re._parser
 
 def safe_urlparse(url):
     try:

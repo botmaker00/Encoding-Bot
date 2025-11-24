@@ -1,0 +1,8 @@
+24-Nov-25 05:11:29 - requests_cache.backends - DEBUG - Initializing backend: sqlite /home/jules/.lk21-requests-cache
+24-Nov-25 05:11:29 - requests_cache.backends.base - DEBUG - Initialized SQLiteDict with serializer: SerializerPipeline(name=pickle, n_stages=2)
+24-Nov-25 05:11:29 - requests_cache.backends.sqlite - DEBUG - Opening connection to /home/jules/.lk21-requests-cache.sqlite:responses
+24-Nov-25 05:11:29 - requests_cache.backends.base - DEBUG - Initialized SQLiteDict with serializer: None
+24-Nov-25 05:11:29 - requests_cache.backends.sqlite - DEBUG - Opening connection to /home/jules/.lk21-requests-cache.sqlite:redirects
+24-Nov-25 05:11:29 - requests_cache.patcher - DEBUG - Patching requests.Session with class: _ConfiguredCachedSession
+24-Nov-25 05:11:29 - requests_cache.backends - DEBUG - Initializing backend: <SQLiteCache(name=/home/jules/.lk21-requests-cache)> /home/jules/.lk21-requests-cache
+24-Nov-25 05:11:30 - VideoEncoder - INFO - Imported Utils!
