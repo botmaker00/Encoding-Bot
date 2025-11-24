@@ -31,24 +31,10 @@ ENCODE_DIR = getenv("ENCODE_DIR", "VideoEncoder/encodes/").rstrip("/")
 DRIVE_DIR = getenv("DRIVE_DIR", "").strip()
 INDEX_URL = getenv("INDEX_URL", "").strip()
 
-# Authorization (Safe Integer List Parser)
-def get_int_list(env_var: str, default=None):
-    if default is None:
-        default = []
-    raw = getenv(env_var, "").strip()
-    if not raw:
-        return default
-    return [int(x) for x in raw.split() if x.lstrip("-").isdigit()]
+OWNER_ID = getenv("OWNER_ID")                     # Example: 123456789
 
-OWNER_ID = get_int_list("OWNER_ID")                     # Example: 123456789
-if not OWNER_ID:
-    raise ValueError("OWNER_ID is mandatory! Fill it in config.env or environment.")
-
-SUDO_USERS = get_int_list("SUDO_USERS")                 # Space separated IDs
-EVERYONE_CHATS = get_int_list("EVERYONE_CHATS")         # Chats where everyone can use bot
-
-# Combined authorized chats (unique)
-AUTHORIZED_CHATS = list(set(OWNER_ID + SUDO_USERS + EVERYONE_CHATS))
+SUDO_USERS = getenv("SUDO_USERS")                 # Space separated IDs
+EVERYONE_CHATS = getenv("EVERYONE_CHATS")         # Chats where everyone can use bot
 
 # Log Channel (Optional, can be user/channel/group ID)
 LOG_CHANNEL_RAW = getenv("LOG_CHANNEL", "").strip()
