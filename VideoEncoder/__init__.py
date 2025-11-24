@@ -107,9 +107,9 @@ LOGGER = logging.getLogger(__name__)
 # Client
 app = Client(
     session,
-    BOT_TOKEN=BOT_TOKEN,
-    API_ID=API_ID,
-    API_HASH=API_HASH,
+    bot_token=BOT_TOKEN,
+    api_id=API_ID,
+    api_hash=API_HASH,
     plugins={'root': os.path.join(__package__, 'plugins')},
     sleep_threshold=30,
     max_concurrent_transmissions=16,
