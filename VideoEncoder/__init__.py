@@ -28,16 +28,9 @@ index = getenv("INDEX_URL")
 download_dir = getenv("DOWNLOAD_DIR")
 encode_dir = getenv("ENCODE_DIR")
 
-def read_ids(var):
-    value = getenv(var)
-    if not value:
-        print(f"Missing env: {var}")
-        return []
-    return [int(x) for x in value.split()]
-
-owner = read_ids("OWNER_ID")
-sudo_users = read_ids("SUDO_USERS")
-everyone = read_ids("EVERYONE_CHATS")
+owner = getenv("OWNER_ID")
+sudo_users = getenv("SUDO_USERS")
+everyone = getenv("EVERYONE_CHATS")
 
 all = everyone + sudo_users + owner
 
