@@ -35,7 +35,7 @@ owner = [os.environ.get("OWNER_ID", "")]
 all = everyone + sudo_users + owner
 
 try:
-    log = getenv("LOG_CHANNEL"))
+    log = getenv("LOG_CHANNEL")
 except:
     log = owner
     print('Fill log or give user/channel/group id atleast!')
