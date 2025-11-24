@@ -30,7 +30,7 @@ encode_dir = os.environ.get("ENCODE_DIR", "VideoEncoder/encodes/")
 
 EVERYONE_CHATS = os.environ.get("EVERYONE_CHATS_CHATS", "").split()
 SUDO_USERS = os.environ.get("SUDO_USERS", "").split()
-OWNER_ID = [os.environ.get("OWNER_ID_ID", "")]
+OWNER_ID = [os.environ.get("OWNER_ID", "")]
 
 all = EVERYONE_CHATS + SUDO_USERS + OWNER_ID
 
