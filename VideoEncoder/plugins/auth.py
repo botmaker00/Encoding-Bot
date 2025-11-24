@@ -2,19 +2,19 @@
 
 from pyrogram import Client, filters
 
-from .. import everyone, sudo_users
+from .. import EVERYONE_CHATS, SUDO_USERS
 from ..utils.database.access_db import db
 from ..utils.helper import check_chat, output
 
 
 @Client.on_message(filters.command('addchat'))
 async def addchat(client, message):
-    c = await check_chat(message, chat='Owner')
+    c = await check_chat(message, chat='OWNER_ID')
     if not c:
         return
     user_id = get_id(message)
     auth = await db.get_chat()
-    if user_id in everyone:
+    if user_id in EVERYONE_CHATS:
         await reply_already_auth(message)
         return
     elif str(user_id) in auth:
@@ -28,12 +28,12 @@ async def addchat(client, message):
 
 @Client.on_message(filters.command('addsudo'))
 async def addsudo(client, message):
-    c = await check_chat(message, chat='Owner')
+    c = await check_chat(message, chat='OWNER_ID')
     if not c:
         return
     user_id = get_id(message)
     auth = await db.get_sudo()
-    if user_id in sudo_users:
+    if user_id in SUDO_USERS:
         await reply_already_auth(message)
         return
     elif str(user_id) in auth:
@@ -47,7 +47,7 @@ async def addsudo(client, message):
 
 @Client.on_message(filters.command('rmchat'))
 async def rmchat(client, message):
-    c = await check_chat(message, chat='Owner')
+    c = await check_chat(message, chat='OWNER_ID')
     if not c:
         return
     user_id = get_id(message)
@@ -58,7 +58,7 @@ async def rmchat(client, message):
         await db.set_chat(auth)
         await message.reply_text('Removed from auth chats! ID: <code>{}</code>'.format(user_id))
         return
-    elif user_id in everyone:
+    elif user_id in EVERYONE_CHATS:
         await message.reply_text('Config auth removal not supported (To Do)!')
         return
     else:
@@ -67,7 +67,7 @@ async def rmchat(client, message):
 
 @Client.on_message(filters.command('rmsudo'))
 async def rmsudo(client, message):
-    c = await check_chat(message, chat='Owner')
+    c = await check_chat(message, chat='OWNER_ID')
     if not c:
         return
     user_id = get_id(message)
@@ -78,7 +78,7 @@ async def rmsudo(client, message):
         await db.set_sudo(auth)
         await message.reply_text('Removed from sudo chats! ID: <code>{}</code>'.format(user_id))
         return
-    elif user_id in everyone:
+    elif user_id in EVERYONE_CHATS:
         await message.reply_text('Config sudo removal not supported (To Do)!')
         return
     else:

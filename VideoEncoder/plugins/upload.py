@@ -7,7 +7,7 @@ import time
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import MessageIdInvalid
 
-from .. import download_dir, sudo_users
+from .. import download_dir, SUDO_USERS
 from ..utils.encoding import get_duration, get_thumbnail, get_width_height
 from ..utils.helper import check_chat
 from ..utils.uploads.drive.upload import Uploader

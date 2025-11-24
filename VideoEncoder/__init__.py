@@ -15,9 +15,9 @@ if os.path.exists('config.env'):
 
 # Variables
 
-api_id = getenv("API_ID")
-api_hash = getenv("API_HASH")
-bot_token = getenv("BOT_TOKEN")
+API_ID = getenv("API_ID")
+API_HASH = getenv("API_HASH")
+BOT_TOKEN = getenv("BOT_TOKEN")
 
 database = getenv("MONGO_URI")
 session = getenv("SESSION_NAME", "abhiencoderbot")
@@ -28,16 +28,16 @@ index = getenv("INDEX_URL")
 download_dir = os.environ.get("DOWNLOAD_DIR", "VideoEncoder/downloads/")
 encode_dir = os.environ.get("ENCODE_DIR", "VideoEncoder/encodes/")
 
-everyone = os.environ.get("EVERYONE_CHATS", "").split()
-sudo_users = os.environ.get("SUDO_USERS", "").split()
-owner = [os.environ.get("OWNER_ID", "")]
+EVERYONE_CHATS = os.environ.get("EVERYONE_CHATS_CHATS", "").split()
+SUDO_USERS = os.environ.get("SUDO_USERS", "").split()
+OWNER_ID = [os.environ.get("OWNER_ID_ID", "")]
 
-all = everyone + sudo_users + owner
+all = EVERYONE_CHATS + SUDO_USERS + OWNER_ID
 
 try:
     log = getenv("LOG_CHANNEL")
 except:
-    log = owner
+    log = OWNER_ID
     print('Fill log or give user/channel/group id atleast!')
 
 
@@ -107,9 +107,9 @@ LOGGER = logging.getLogger(__name__)
 # Client
 app = Client(
     session,
-    bot_token=bot_token,
-    api_id=api_id,
-    api_hash=api_hash,
+    BOT_TOKEN=BOT_TOKEN,
+    API_ID=API_ID,
+    API_HASH=API_HASH,
     plugins={'root': os.path.join(__package__, 'plugins')},
     sleep_threshold=30,
     max_concurrent_transmissions=16,

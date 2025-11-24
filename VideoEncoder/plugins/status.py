@@ -5,7 +5,7 @@ from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineK
 from time import time
 import os
 
-from .. import app, botStartTime, download_dir, data, sudo_users, owner
+from .. import app, botStartTime, download_dir, data, SUDO_USERS, OWNER_ID
 from ..utils.display_progress import humanbytes, TimeFormatter
 from ..utils.helper import check_chat
 

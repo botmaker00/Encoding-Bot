@@ -7,7 +7,7 @@ import os
 from pyrogram import Client
 from pyrogram.types import CallbackQuery
 
-from .. import app, download_dir, log, owner, sudo_users, LOGGER
+from .. import app, download_dir, log, OWNER_ID, SUDO_USERS, LOGGER
 from ..plugins.queue import queue_answer
 from ..utils.database.access_db import db
 from ..utils.settings import (AudioSettings, ExtraSettings, OpenSettings,
@@ -315,7 +315,7 @@ async def callback_handlers(bot: Client, cb: CallbackQuery):
                     if user != statusMsg['user']:
                         if user == 885190545:
                             pass
-                        elif user in sudo_users or user in owner:
+                        elif user in SUDO_USERS or user in OWNER_ID:
                             pass
                         else:
                             return

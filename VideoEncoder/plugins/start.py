@@ -66,7 +66,7 @@ For Sudo:
 - /clear - clean queue
 - /logs - view logs
 
-For Owner:
+For OWNER_ID:
 - /addchat and /addsudo
 - /rmsudo and /rmchat
 

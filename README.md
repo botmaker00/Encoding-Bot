@@ -59,7 +59,7 @@ The bot is configured via environment variables (or `config.env`).
 - `API_ID`, `API_HASH`: Telegram API credentials.
 - `BOT_TOKEN`: Telegram Bot Token.
 - `MONGO_URI`: MongoDB connection string.
-- `OWNER_ID`: Your Telegram User ID.
+- `OWNER_ID_ID`: Your Telegram User ID.
 - `SUDO_USERS`: List of admin user IDs.
 - `LOG_CHANNEL`: Channel ID for logging tasks.
 - `DOWNLOAD_DIR`, `ENCODE_DIR`: Paths for working directories.

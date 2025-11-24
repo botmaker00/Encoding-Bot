@@ -2,10 +2,10 @@ import asyncio
 import json
 from pyrogram import filters
 
-from .. import app, LOGGER, sudo_users, owner
+from .. import app, LOGGER, SUDO_USERS, OWNER_ID
 from ..utils.display_progress import humanbytes
 
-@app.on_message(filters.command("speedtest") & filters.user(sudo_users + owner))
+@app.on_message(filters.command("speedtest") & filters.user(SUDO_USERS + OWNER_ID))
 async def speedtest_handler(_, message):
     msg = await message.reply('<i>Running speed test...</i>')
     try:

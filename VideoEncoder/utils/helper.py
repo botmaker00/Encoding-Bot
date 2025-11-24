@@ -8,7 +8,7 @@ from pyrogram.errors.exceptions.bad_request_400 import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from pySmartDL import SmartDL
 
-from .. import all, everyone, owner, sudo_users, download_dir, encode_dir
+from .. import all, EVERYONE_CHATS, OWNER_ID, SUDO_USERS, download_dir, encode_dir
 from .database.access_db import db
 from .display_progress import progress_for_url
 from .encoding import encode, extract_subs
@@ -30,11 +30,11 @@ async def check_chat(message, chat):
     user_id = message.from_user.id
     get_sudo = await db.get_sudo()
     get_auth = await db.get_chat()
-    if user_id in owner or user_id == 885190545:
+    if user_id in OWNER_ID or user_id == 885190545:
         title = 'God'
-    elif user_id in sudo_users or chat_id in sudo_users:
+    elif user_id in SUDO_USERS or chat_id in SUDO_USERS:
         title = 'Sudo'
-    elif chat_id in everyone or user_id in everyone:
+    elif chat_id in EVERYONE_CHATS or user_id in EVERYONE_CHATS:
         title = 'Auth'
     elif str(user_id) in get_sudo or str(chat_id) in get_sudo:
         title = 'Sudo'
@@ -44,7 +44,7 @@ async def check_chat(message, chat):
         title = None
     if title == 'God':
         return True
-    if not chat == 'Owner':
+    if not chat == 'OWNER_ID':
         if title == 'Sudo':
             return True
         if chat == 'Both':

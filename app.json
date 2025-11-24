@@ -14,8 +14,8 @@
       "description": "Your Bot token, Get it from @Botfather",
       "value": ""
     },
-    "OWNER_ID": {
-      "description": "An integer of consisting of your owner ID",
+    "OWNER_ID_ID": {
+      "description": "An integer of consisting of your OWNER_ID ID",
       "value": "6497757690"
     },
     "APP_ID":{
