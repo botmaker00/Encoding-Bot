@@ -81,6 +81,9 @@ if not os.path.isdir(download_dir):
 if not os.path.isdir(encode_dir):
     os.makedirs(encode_dir)
 
+if not os.path.isdir('VideoEncoder/utils/extras'):
+    os.makedirs('VideoEncoder/utils/extras')
+
 # the logging things
 logging.basicConfig(
     level=logging.DEBUG,
