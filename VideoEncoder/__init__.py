@@ -107,9 +107,3 @@ app = Client(
     ipv6=False
 )
 
-# Optional: Startup message
-LOGGER.info("Video Encoder Bot Configuration Loaded Successfully!")
-if LOG_CHANNEL:
-    LOGGER.info(f"Log Channel Set: {LOG_CHANNEL}")
-else:
-    LOGGER.info(f"Log Channel Not Set – Logs will be sent to OWNER ({OWNER_ID[0]})")
