@@ -15,7 +15,7 @@ if os.path.exists('config.env'):
 
 # Variables
 
-api_id = getenv("API_ID"))
+api_id = getenv("API_ID")
 api_hash = getenv("API_HASH")
 bot_token = getenv("BOT_TOKEN")
 
