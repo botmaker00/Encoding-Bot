@@ -20,7 +20,7 @@ api_hash = getenv("API_HASH")
 bot_token = getenv("BOT_TOKEN")
 
 database = getenv("MONGO_URI")
-session = getenv("SESSION_NAME")
+session = getenv("SESSION_NAME", "abhiencoderbot")
 
 drive_dir = getenv("DRIVE_DIR")
 index = getenv("INDEX_URL")
