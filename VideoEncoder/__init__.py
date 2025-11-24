@@ -37,11 +37,7 @@ SUDO_USERS = getenv("SUDO_USERS")                 # Space separated IDs
 EVERYONE_CHATS = getenv("EVERYONE_CHATS")         # Chats where everyone can use bot
 
 # Log Channel (Optional, can be user/channel/group ID)
-LOG_CHANNEL_RAW = getenv("LOG_CHANNEL", "").strip()
-if LOG_CHANNEL_RAW and LOG_CHANNEL_RAW.lstrip("-").isdigit():
-    LOG_CHANNEL = int(LOG_CHANNEL_RAW)
-else:
-    LOG_CHANNEL = None  # Will send logs to OWNER if not set
+LOG_CHANNEL = getenv("LOG_CHANNEL", "").strip()
 
 # Progress Format
 PROGRESS = """
