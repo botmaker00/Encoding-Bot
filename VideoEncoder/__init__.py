@@ -25,8 +25,8 @@ session = getenv("SESSION_NAME")
 drive_dir = getenv("DRIVE_DIR")
 index = getenv("INDEX_URL")
 
-download_dir = getenv("DOWNLOAD_DIR")
-encode_dir = getenv("ENCODE_DIR")
+download_dir = os.environ.get("DOWNLOAD_DIR")
+encode_dir = os.environ.get("ENCODE_DIR")
 
 everyone = os.environ.get("EVERYONE_CHATS", "").split()
 sudo_users = os.environ.get("SUDO_USERS", "").split()
