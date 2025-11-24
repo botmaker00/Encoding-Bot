@@ -6,6 +6,9 @@ from io import BytesIO, StringIO
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 from pyrogram import Client
+import pyrogram
+
+pyrogram.utils.MIN_CHANNEL_ID = -1002822095762
 
 # Load env file if exists
 if os.path.exists('config.env'):
