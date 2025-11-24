@@ -28,9 +28,9 @@ index = getenv("INDEX_URL")
 download_dir = getenv("DOWNLOAD_DIR")
 encode_dir = getenv("ENCODE_DIR")
 
-owner = getenv("OWNER_ID")
-sudo_users = getenv("SUDO_USERS")
-everyone = getenv("EVERYONE_CHATS")
+everyone = os.environ.get("EVERYONE_CHATS", "").split()
+sudo_users = os.environ.get("SUDO_USERS", "").split()
+owner = [os.environ.get("OWNER_ID", "")]
 
 all = everyone + sudo_users + owner
 
