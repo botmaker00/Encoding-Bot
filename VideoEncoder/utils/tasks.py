@@ -101,24 +101,25 @@ async def tg_task(message, msg):
 
     import re
     match_i = re.search(r'-i\s+(\d+)', text_content, re.IGNORECASE)
-    specified_msg_id = int(match_i.group(1)) if match_i else None
+    specified_count = int(match_i.group(1)) if match_i else None
 
-    specified_msg = None
-    if specified_msg_id:
+    fetched_messages = []
+    if specified_count:
+        if message.reply_to_message:
+            base_id = message.reply_to_message.id
+            ids = list(range(base_id - specified_count + 1, base_id + 1))
+        else:
+            base_id = message.id
+            ids = list(range(base_id - specified_count, base_id))
+
         try:
-            specified_msg = await message._client.get_messages(chat_id=message.chat.id, message_ids=specified_msg_id)
+            fetched_messages = await message._client.get_messages(chat_id=message.chat.id, message_ids=ids)
+            if not isinstance(fetched_messages, list):
+                fetched_messages = [fetched_messages]
         except Exception as e:
-            LOGGER.error(f"Failed to fetch message with ID {specified_msg_id}: {e}")
-            await msg.edit(f"Could not find or fetch message with ID: {specified_msg_id}")
+            LOGGER.error(f"Failed to fetch messages with IDs {ids}: {e}")
+            await msg.edit(f"Could not find or fetch the requested {specified_count} messages.")
             return
-
-    candidates = []
-    if message:
-        candidates.append(message)
-    if message.reply_to_message:
-        candidates.append(message.reply_to_message)
-    if specified_msg:
-        candidates.append(specified_msg)
 
     def is_video_msg(m):
         if not m:
@@ -151,7 +152,14 @@ async def tg_task(message, msg):
     video_msg = None
     subtitle_msg = None
 
-    for candidate in [specified_msg, message.reply_to_message, message]:
+    search_order = []
+    if fetched_messages:
+        search_order.extend(reversed(fetched_messages))
+    if message.reply_to_message:
+        search_order.append(message.reply_to_message)
+    search_order.append(message)
+
+    for candidate in search_order:
         if not candidate:
             continue
         if not video_msg and is_video_msg(candidate):
