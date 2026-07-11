@@ -14,7 +14,7 @@ from pyrogram.parser import html as pyrogram_html
 from pyrogram.types import Message
 from requests.utils import unquote
 
-from .. import LOGGER, data, download_dir, video_mimetype
+from .. import LOGGER, data, download_dir, video_mimetype, encode_dir
 from .database.access_db import db
 from .direct_link_generator import direct_link_generator
 from .display_progress import progress_for_pyrogram
@@ -96,12 +96,88 @@ async def handle_tasks(message, mode):
 
 
 async def tg_task(message, msg):
-    filepath = await handle_tg_down(message, msg)
+    text_content = message.text or message.caption or ""
+    is_hardsub_flag = "-hardsub" in text_content.lower()
+
+    import re
+    match_i = re.search(r'-i\s+(\d+)', text_content, re.IGNORECASE)
+    specified_msg_id = int(match_i.group(1)) if match_i else None
+
+    specified_msg = None
+    if specified_msg_id:
+        try:
+            specified_msg = await message._client.get_messages(chat_id=message.chat.id, message_ids=specified_msg_id)
+        except Exception as e:
+            LOGGER.error(f"Failed to fetch message with ID {specified_msg_id}: {e}")
+            await msg.edit(f"Could not find or fetch message with ID: {specified_msg_id}")
+            return
+
+    candidates = []
+    if message:
+        candidates.append(message)
+    if message.reply_to_message:
+        candidates.append(message.reply_to_message)
+    if specified_msg:
+        candidates.append(specified_msg)
+
+    def is_video_msg(m):
+        if not m:
+            return False
+        if m.video:
+            return True
+        if m.document:
+            mime = m.document.mime_type or ""
+            if mime in video_mimetype:
+                return True
+            name = m.document.file_name or ""
+            ext = os.path.splitext(name)[1].lower()
+            if ext in ['.mp4', '.mkv', '.avi', '.webm', '.m4v', '.mov', '.flv']:
+                return True
+        return False
+
+    def is_subtitle_msg(m):
+        if not m:
+            return False
+        if m.document:
+            name = m.document.file_name or ""
+            ext = os.path.splitext(name)[1].lower()
+            if ext in ['.ass', '.srt', '.vtt', '.sub']:
+                return True
+            mime = m.document.mime_type or ""
+            if 'subtitle' in mime or mime in ['application/x-subrip', 'text/vtt']:
+                return True
+        return False
+
+    video_msg = None
+    subtitle_msg = None
+
+    for candidate in [specified_msg, message.reply_to_message, message]:
+        if not candidate:
+            continue
+        if not video_msg and is_video_msg(candidate):
+            video_msg = candidate
+        elif not subtitle_msg and is_subtitle_msg(candidate):
+            subtitle_msg = candidate
+
+    if not video_msg:
+        video_msg = message
+
+    filepath = await handle_tg_down(video_msg, msg)
+
     if not filepath:
         await msg.edit("Download failed or no file found.")
         return
+
+    has_ext_sub = False
+    if subtitle_msg:
+        await msg.edit("Downloading subtitle...")
+        sub_ext = os.path.splitext(subtitle_msg.document.file_name)[1].lower()
+        sub_filepath = os.path.join(encode_dir, f"{msg.id}{sub_ext}")
+        await subtitle_msg.download(file_name=sub_filepath)
+        has_ext_sub = True
+
     await msg.edit('Encoding...')
-    await handle_encode(filepath, message, msg)
+    await handle_encode(filepath, message, msg, has_ext_sub=has_ext_sub, force_hardsub=is_hardsub_flag)
 
 
 async def af_task(message, msg):
