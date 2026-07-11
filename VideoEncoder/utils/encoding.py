@@ -77,7 +77,7 @@ async def extract_subs(filepath, msg, user_id):
         return None
 
 
-async def encode(filepath, message, msg, audio_map=None):
+async def encode(filepath, message, msg, audio_map=None, has_ext_sub=False, force_hardsub=False):
 
     ex = await db.get_extensions(message.from_user.id)
     path, extension = os.path.splitext(filepath)
@@ -92,6 +92,11 @@ async def encode(filepath, message, msg, audio_map=None):
 
     output_filepath = output_filepathh
     subtitles_path = os.path.join(encode_dir, str(msg.id) + '.ass')
+    for ext in ['.ass', '.srt', '.vtt', '.sub']:
+        possible_path = os.path.join(encode_dir, f"{msg.id}{ext}")
+        if os.path.isfile(possible_path):
+            subtitles_path = possible_path
+            break
 
     progress = os.path.join(download_dir, "process.txt")
     with open(progress, 'w') as f:
@@ -210,7 +215,7 @@ async def encode(filepath, message, msg, audio_map=None):
         metadata = ''
 
     # Copy Subtitles
-    h = await db.get_hardsub(message.from_user.id)
+    h = force_hardsub or await db.get_hardsub(message.from_user.id) or has_ext_sub
     s = await db.get_subtitles(message.from_user.id)
     subs_i = get_codec(filepath, channel='s:0')
     if subs_i == []:
