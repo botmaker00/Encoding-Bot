@@ -85,6 +85,40 @@ if not os.path.isdir(encode_dir):
 if not os.path.isdir('VideoEncoder/utils/extras'):
     os.makedirs('VideoEncoder/utils/extras')
 
+# Download multilingual fonts for Devanagari/Hindi and English to prevent "tofu" boxes
+def download_multilingual_fonts():
+    import urllib.request
+    fonts_dir = os.path.expanduser('~/.fonts')
+    if not os.path.isdir(fonts_dir):
+        os.makedirs(fonts_dir)
+
+    font_urls = {
+        "NotoSansDevanagari-Regular.ttf": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf",
+        "NotoSansDevanagari-Bold.ttf": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Bold.ttf",
+        "NotoSans-Regular.ttf": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf",
+        "NotoSans-Bold.ttf": "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Bold.ttf"
+    }
+
+    for filename, url in font_urls.items():
+        filepath = os.path.join(fonts_dir, filename)
+        if not os.path.exists(filepath):
+            try:
+                print(f"Downloading font: {filename}...")
+                urllib.request.urlretrieve(url, filepath)
+            except Exception as e:
+                print(f"Failed to download font {filename}: {e}")
+
+    # Run fc-cache to register the newly added fonts
+    try:
+        os.system("fc-cache -f")
+    except Exception as e:
+        print(f"fc-cache failed: {e}")
+
+try:
+    download_multilingual_fonts()
+except Exception as e:
+    print(f"Failed to setup fonts: {e}")
+
 # the logging things
 logging.basicConfig(
     level=logging.DEBUG,
