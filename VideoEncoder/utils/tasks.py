@@ -95,6 +95,34 @@ async def handle_tasks(message, mode):
         await on_task_complete()
 
 
+async def wait_for_second_file(app, chat_id, user_id, timeout=300):
+    from pyrogram.handlers import MessageHandler
+    from pyrogram import filters
+
+    future = asyncio.get_running_loop().create_future()
+
+    async def callback(client, message):
+        if message.chat.id == chat_id and message.from_user and message.from_user.id == user_id:
+            if message.video or message.document:
+                if not future.done():
+                    future.set_result(message)
+
+    handler = MessageHandler(
+        callback,
+        filters.chat(chat_id) & (filters.video | filters.document)
+    )
+
+    app.add_handler(handler, group=-1)
+
+    try:
+        second_msg = await asyncio.wait_for(future, timeout=timeout)
+        return second_msg
+    except asyncio.TimeoutError:
+        return None
+    finally:
+        app.remove_handler(handler, group=-1)
+
+
 async def tg_task(message, msg):
     text_content = message.text or message.caption or ""
     is_hardsub_flag = "-hardsub" in text_content.lower()
@@ -102,24 +130,6 @@ async def tg_task(message, msg):
     import re
     match_i = re.search(r'-i\s+(\d+)', text_content, re.IGNORECASE)
     specified_count = int(match_i.group(1)) if match_i else None
-
-    fetched_messages = []
-    if specified_count:
-        if message.reply_to_message:
-            base_id = message.reply_to_message.id
-            ids = list(range(base_id - specified_count + 1, base_id + 1))
-        else:
-            base_id = message.id
-            ids = list(range(base_id - specified_count, base_id))
-
-        try:
-            fetched_messages = await message._client.get_messages(chat_id=message.chat.id, message_ids=ids)
-            if not isinstance(fetched_messages, list):
-                fetched_messages = [fetched_messages]
-        except Exception as e:
-            LOGGER.error(f"Failed to fetch messages with IDs {ids}: {e}")
-            await msg.edit(f"Could not find or fetch the requested {specified_count} messages.")
-            return
 
     def is_video_msg(m):
         if not m:
@@ -149,40 +159,76 @@ async def tg_task(message, msg):
                 return True
         return False
 
-    video_msg = None
-    subtitle_msg = None
+    first_msg = message.reply_to_message or message
+    is_first_video = is_video_msg(first_msg)
+    is_first_subtitle = is_subtitle_msg(first_msg)
 
-    search_order = []
-    if fetched_messages:
-        search_order.extend(reversed(fetched_messages))
-    if message.reply_to_message:
-        search_order.append(message.reply_to_message)
-    search_order.append(message)
-
-    for candidate in search_order:
-        if not candidate:
-            continue
-        if not video_msg and is_video_msg(candidate):
-            video_msg = candidate
-        elif not subtitle_msg and is_subtitle_msg(candidate):
-            subtitle_msg = candidate
-
-    if not video_msg:
-        video_msg = message
-
-    filepath = await handle_tg_down(video_msg, msg)
-
-    if not filepath:
-        await msg.edit("Download failed or no file found.")
-        return
-
+    filepath = None
+    sub_filepath = None
     has_ext_sub = False
-    if subtitle_msg:
-        await msg.edit("Downloading subtitle...")
-        sub_ext = os.path.splitext(subtitle_msg.document.file_name)[1].lower()
+
+    if is_first_video:
+        # Download video first
+        await msg.edit("<b>💠 Downloading Video...</b>")
+        filepath = await handle_tg_down(first_msg, msg)
+        if not filepath:
+            await msg.edit("Download failed or no video file found.")
+            return
+
+        # If we need a second file
+        if specified_count and specified_count >= 2:
+            await msg.edit("<b>📥 Video downloaded. Please send the subtitle file (.ass, .srt, .vtt)...</b>")
+            subtitle_msg = await wait_for_second_file(message._client, message.chat.id, message.from_user.id)
+            if not subtitle_msg or not is_subtitle_msg(subtitle_msg):
+                await msg.edit("Waiting timed out or invalid subtitle file received. Cancelled.")
+                try:
+                    os.remove(filepath)
+                except Exception:
+                    pass
+                return
+
+            await msg.edit("<b>Downloading subtitle...</b>")
+            sub_ext = os.path.splitext(subtitle_msg.document.file_name)[1].lower()
+            sub_filepath = os.path.join(encode_dir, f"{msg.id}{sub_ext}")
+            await subtitle_msg.download(file_name=sub_filepath)
+            has_ext_sub = True
+
+    elif is_first_subtitle:
+        # Download subtitle first
+        await msg.edit("<b>💠 Downloading Subtitle...</b>")
+        sub_ext = os.path.splitext(first_msg.document.file_name)[1].lower()
         sub_filepath = os.path.join(encode_dir, f"{msg.id}{sub_ext}")
-        await subtitle_msg.download(file_name=sub_filepath)
+        await first_msg.download(file_name=sub_filepath)
         has_ext_sub = True
+
+        # If we need a second file
+        if specified_count and specified_count >= 2:
+            await msg.edit("<b>📥 Subtitle downloaded. Please send the video file...</b>")
+            video_msg = await wait_for_second_file(message._client, message.chat.id, message.from_user.id)
+            if not video_msg or not is_video_msg(video_msg):
+                await msg.edit("Waiting timed out or invalid video file received. Cancelled.")
+                try:
+                    os.remove(sub_filepath)
+                except Exception:
+                    pass
+                return
+
+            await msg.edit("<b>💠 Downloading Video...</b>")
+            filepath = await handle_tg_down(video_msg, msg)
+            if not filepath:
+                await msg.edit("Download failed or no video file found.")
+                try:
+                    os.remove(sub_filepath)
+                except Exception:
+                    pass
+                return
+
+    else:
+        # Fallback to standard flow
+        filepath = await handle_tg_down(message, msg)
+        if not filepath:
+            await msg.edit("Download failed or no file found.")
+            return
 
     await msg.edit('Encoding...')
     await handle_encode(filepath, message, msg, has_ext_sub=has_ext_sub, force_hardsub=is_hardsub_flag)
